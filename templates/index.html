@@ -78,12 +78,12 @@
                         {% endif %}
                         
                         {% if success and result %}
-                        <div class="mt-4">
+                        <div class="mt-4" id="scrape-results">
                             <div class="alert alert-success" role="alert">
                                 <i data-feather="check-circle" class="me-2"></i>
-                                <strong>Success!</strong> Metadata extracted successfully.
+                                <strong>✅ Success!</strong> Metadata extracted successfully.
                             </div>
-                            <h6>Results:</h6>
+                            <h5 class="text-success">📊 Extracted Results:</h5>
                             <div class="card">
                                 <div class="card-body">
                                     <h6 class="card-title">{{ result.og_title or 'No title available' }}</h6>
@@ -210,6 +210,17 @@
                     });
             } catch (e) {
                 console.log('API status check failed');
+            }
+            
+            // Auto-scroll to results if they exist
+            var resultsSection = document.getElementById('scrape-results');
+            if (resultsSection) {
+                setTimeout(function() {
+                    resultsSection.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }, 500);
             }
         });
     </script>

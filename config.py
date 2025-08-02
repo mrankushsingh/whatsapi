@@ -68,8 +68,10 @@ def validate_whatsapp_link(link: str) -> Dict[str, Any]:
             "message": "Link must be a valid WhatsApp group invite link starting with 'https://chat.whatsapp.com/'"
         }
     
-    # Extract the group code part
+    # Extract the group code part - handle both formats: /invite/CODE and /CODE
     group_code = link.replace("https://chat.whatsapp.com/", "")
+    if group_code.startswith("invite/"):
+        group_code = group_code.replace("invite/", "")
     
     if not group_code:
         return {
