@@ -46,12 +46,13 @@
                             <i data-feather="test-tube" class="me-2"></i>
                             Test the API
                         </h5>
-                        <form id="test-form">
+                        <form action="/test-scrape" method="post">
                             <div class="mb-3">
                                 <label for="whatsapp-link" class="form-label">WhatsApp Group Link</label>
                                 <input 
                                     type="url" 
                                     class="form-control" 
+                                    name="link"
                                     id="whatsapp-link" 
                                     placeholder="https://chat.whatsapp.com/XXXXXXXXX"
                                     required
@@ -67,10 +68,40 @@
                         </form>
                         
                         <!-- Results -->
-                        <div id="test-results" class="mt-4" style="display: none;">
-                            <h6>Results:</h6>
-                            <pre id="results-content" class="bg-dark p-3 rounded"></pre>
+                        {% if error %}
+                        <div class="mt-4">
+                            <div class="alert alert-danger" role="alert">
+                                <i data-feather="alert-circle" class="me-2"></i>
+                                <strong>Error:</strong> {{ error }}
+                            </div>
                         </div>
+                        {% endif %}
+                        
+                        {% if success and result %}
+                        <div class="mt-4">
+                            <div class="alert alert-success" role="alert">
+                                <i data-feather="check-circle" class="me-2"></i>
+                                <strong>Success!</strong> Metadata extracted successfully.
+                            </div>
+                            <h6>Results:</h6>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ result.og_title or 'No title available' }}</h6>
+                                    {% if result.og_image %}
+                                    <img src="{{ result.og_image }}" alt="Group Image" class="img-fluid mb-3" style="max-width: 200px;">
+                                    {% endif %}
+                                    <p class="card-text">
+                                        <strong>Description:</strong> {{ result.og_description or 'No description available' }}<br>
+                                        <strong>Link:</strong> <a href="{{ result.link }}" target="_blank">{{ result.link }}</a>
+                                    </p>
+                                    <details>
+                                        <summary>Raw JSON Data</summary>
+                                        <pre class="bg-dark p-3 rounded mt-2"><code>{{ result | tojson(indent=2) }}</code></pre>
+                                    </details>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -147,90 +178,38 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
     <script>
-        function checkApiStatus() {
-            fetch('/health')
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(data) {
-                    var statusElement = document.getElementById('api-status');
-                    if (statusElement) {
-                        statusElement.innerHTML = '<span class="badge bg-success me-2">Online</span>' + 
-                                                 data.message + ' (v' + data.version + ')';
-                    }
-                })
-                .catch(function(error) {
-                    var statusElement = document.getElementById('api-status');
-                    if (statusElement) {
-                        statusElement.innerHTML = '<span class="badge bg-danger me-2">Error</span>Unable to check API status';
-                    }
-                });
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            var linkInput = document.getElementById('whatsapp-link');
-            var resultsDiv = document.getElementById('test-results');
-            var resultsContent = document.getElementById('results-content');
-            
-            if (!linkInput || !resultsDiv || !resultsContent) {
-                alert('Form elements not found');
-                return;
-            }
-            
-            var link = linkInput.value.trim();
-            if (!link) {
-                resultsContent.textContent = 'Please enter a WhatsApp group link';
-                resultsDiv.style.display = 'block';
-                return;
-            }
-            
-            // Show loading state
-            resultsDiv.style.display = 'block';
-            resultsContent.textContent = 'Scraping in progress...';
-            resultsContent.className = 'bg-dark p-3 rounded';
-            
-            // Make the API request
-            fetch('/scrape', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ link: link })
-            })
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(data) {
-                resultsContent.textContent = JSON.stringify(data, null, 2);
-                
-                if (data.error) {
-                    resultsContent.className = 'bg-danger p-3 rounded text-white';
-                } else {
-                    resultsContent.className = 'bg-success p-3 rounded text-white';
+        // Simple initialization
+        document.addEventListener('DOMContentLoaded', function() {            
+            // Initialize Feather icons with error handling
+            try {
+                if (window.feather) {
+                    feather.replace();
                 }
-            })
-            .catch(function(error) {
-                resultsContent.textContent = 'Network Error: ' + error.message;
-                resultsContent.className = 'bg-danger p-3 rounded text-white';
-            });
-        }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Feather icons
-            if (window.feather) {
-                feather.replace();
+            } catch (e) {
+                console.log('Feather icons not available');
             }
             
             // Check API status
-            checkApiStatus();
-            
-            // Set up form handler
-            var testForm = document.getElementById('test-form');
-            if (testForm) {
-                testForm.addEventListener('submit', handleFormSubmit);
+            try {
+                fetch('/health')
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        var statusElement = document.getElementById('api-status');
+                        if (statusElement) {
+                            statusElement.innerHTML = '<span class="badge bg-success me-2">Online</span>' + 
+                                                     data.message + ' (v' + data.version + ')';
+                        }
+                    })
+                    .catch(function(error) {
+                        var statusElement = document.getElementById('api-status');
+                        if (statusElement) {
+                            statusElement.innerHTML = '<span class="badge bg-danger me-2">Error</span>Unable to check API status';
+                        }
+                    });
+            } catch (e) {
+                console.log('API status check failed');
             }
         });
     </script>

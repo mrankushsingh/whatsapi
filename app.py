@@ -35,6 +35,40 @@ def health_check():
         "version": "1.0.0"
     }), 200
 
+@app.route('/test-scrape', methods=['POST'])
+def test_scrape():
+    """
+    Test scraping endpoint for HTML form submission
+    """
+    try:
+        link = request.form.get('link')
+        if not link:
+            return render_template('index.html', error="Missing WhatsApp group link")
+        
+        # Validate WhatsApp link format
+        validation_result = validate_whatsapp_link(link)
+        if not validation_result["valid"]:
+            return render_template('index.html', error=validation_result["message"])
+        
+        # Log the scraping attempt
+        logger.info(f"Attempting to scrape: {link}")
+        
+        # Perform scraping
+        result = scrape_og_tags(link)
+        
+        # Add the original link to the response
+        if "error" not in result:
+            result["link"] = link
+            logger.info(f"Successfully scraped: {link}")
+            return render_template('index.html', success=True, result=result)
+        else:
+            logger.error(f"Failed to scrape: {link} - {result['error']}")
+            return render_template('index.html', error=result['error'])
+    
+    except Exception as e:
+        logger.error(f"Unexpected error in /test-scrape endpoint: {str(e)}")
+        return render_template('index.html', error="Internal server error occurred while processing the request")
+
 @app.route('/scrape', methods=['POST'])
 def scrape():
     """
