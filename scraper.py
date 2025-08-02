@@ -1,5 +1,6 @@
+import os
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 import random
 import logging
 from typing import Dict, Any
@@ -55,10 +56,10 @@ def scrape_og_tags(link: str) -> Dict[str, Any]:
             og_url = soup.find('meta', property='og:url')
             
             # Extract content from meta tags
-            title = og_title.get('content') if og_title else None
-            image = og_image.get('content') if og_image else None
-            description = og_description.get('content') if og_description else None
-            url = og_url.get('content') if og_url else None
+            title = og_title.get('content') if isinstance(og_title, Tag) else None
+            image = og_image.get('content') if isinstance(og_image, Tag) else None
+            description = og_description.get('content') if isinstance(og_description, Tag) else None
+            url = og_url.get('content') if isinstance(og_url, Tag) else None
             
             # Also try to get title from <title> tag if og:title is not available
             if not title:
@@ -97,9 +98,9 @@ def scrape_og_tags(link: str) -> Dict[str, Any]:
         except requests.exceptions.HTTPError as e:
             logger.warning(f"HTTP error on attempt {attempt + 1}: {str(e)}")
             # If it's a 4xx error, don't retry as it's likely not a proxy issue
-            if 400 <= response.status_code < 500:
+            if hasattr(e, 'response') and e.response and 400 <= e.response.status_code < 500:
                 return {
-                    "error": f"HTTP {response.status_code}: Unable to access the WhatsApp group link. The link may be invalid or expired."
+                    "error": f"HTTP {e.response.status_code}: Unable to access the WhatsApp group link. The link may be invalid or expired."
                 }
             continue
             
@@ -113,4 +114,4 @@ def scrape_og_tags(link: str) -> Dict[str, Any]:
         "error": f"Unable to scrape the link after {attempts} attempts. All proxies failed or the link may be inaccessible."
     }
 
-import os  # Add this import at the top
+
