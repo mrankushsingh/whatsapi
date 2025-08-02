@@ -74,4 +74,4 @@ Preferred communication style: Simple, everyday language.
 - **Environment variables**: All sensitive configuration through environment variables
 - **Debug mode**: Development-friendly error reporting and auto-reload
 - **CORS configuration**: Cross-origin request handling for API consumption
-- **Health monitoring**: Built-in health check endpoint for monitoring services
+- **Health monitoring**: Built-in health check endpoint for monitoring services 
