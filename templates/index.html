@@ -147,67 +147,100 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
     <script>
-        // Initialize Feather icons
-        feather.replace();
-
-        // Check API status
+        // Check API status function
         async function checkApiStatus() {
             try {
                 const response = await fetch('/health');
                 const data = await response.json();
                 
                 const statusElement = document.getElementById('api-status');
-                if (response.ok) {
-                    statusElement.innerHTML = `
-                        <span class="badge bg-success me-2">Online</span>
-                        ${data.message} (v${data.version})
-                    `;
-                } else {
-                    statusElement.innerHTML = `
-                        <span class="badge bg-danger me-2">Offline</span>
-                        API is not responding
-                    `;
+                if (statusElement) {
+                    if (response.ok) {
+                        statusElement.innerHTML = `
+                            <span class="badge bg-success me-2">Online</span>
+                            ${data.message} (v${data.version})
+                        `;
+                    } else {
+                        statusElement.innerHTML = `
+                            <span class="badge bg-danger me-2">Offline</span>
+                            API is not responding
+                        `;
+                    }
                 }
             } catch (error) {
                 const statusElement = document.getElementById('api-status');
-                statusElement.innerHTML = `
-                    <span class="badge bg-danger me-2">Error</span>
-                    Unable to check API status
-                `;
+                if (statusElement) {
+                    statusElement.innerHTML = `
+                        <span class="badge bg-danger me-2">Error</span>
+                        Unable to check API status
+                    `;
+                }
             }
         }
 
-        // Test form submission
-        document.getElementById('test-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // Initialize everything when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Feather icons
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
             
-            const link = document.getElementById('whatsapp-link').value;
-            const resultsDiv = document.getElementById('test-results');
-            const resultsContent = document.getElementById('results-content');
+            // Check API status on page load
+            checkApiStatus();
             
-            // Show loading state
-            resultsDiv.style.display = 'block';
-            resultsContent.textContent = 'Scraping in progress...';
-            
-            try {
-                const response = await fetch('/scrape', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ link: link })
+            // Set up form submission handler
+            const testForm = document.getElementById('test-form');
+            if (testForm) {
+                testForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const linkInput = document.getElementById('whatsapp-link');
+                    const resultsDiv = document.getElementById('test-results');
+                    const resultsContent = document.getElementById('results-content');
+                    
+                    if (!linkInput || !resultsDiv || !resultsContent) {
+                        console.error('Required form elements not found');
+                        return;
+                    }
+                    
+                    const link = linkInput.value.trim();
+                    if (!link) {
+                        resultsContent.textContent = 'Please enter a WhatsApp group link';
+                        resultsDiv.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Show loading state
+                    resultsDiv.style.display = 'block';
+                    resultsContent.textContent = 'Scraping in progress...';
+                    resultsContent.className = 'bg-dark p-3 rounded';
+                    
+                    try {
+                        const response = await fetch('/scrape', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ link: link })
+                        });
+                        
+                        const data = await response.json();
+                        resultsContent.textContent = JSON.stringify(data, null, 2);
+                        
+                        // Style the results based on success/error
+                        if (data.error) {
+                            resultsContent.className = 'bg-danger p-3 rounded text-white';
+                        } else {
+                            resultsContent.className = 'bg-dark p-3 rounded text-success';
+                        }
+                        
+                    } catch (error) {
+                        resultsContent.textContent = `Network Error: ${error.message}`;
+                        resultsContent.className = 'bg-danger p-3 rounded text-white';
+                    }
                 });
-                
-                const data = await response.json();
-                resultsContent.textContent = JSON.stringify(data, null, 2);
-                
-            } catch (error) {
-                resultsContent.textContent = `Error: ${error.message}`;
             }
         });
-
-        // Check API status on page load
-        checkApiStatus();
     </script>
 </body>
 </html>
