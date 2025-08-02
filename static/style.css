@@ -1,0 +1,181 @@
+/* Custom styles for WhatsApp Group Link Scraper API */
+
+/* Smooth scrolling for the entire document */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom styling for code blocks */
+pre {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    overflow-x: auto;
+}
+
+pre code {
+    color: #e9ecef;
+}
+
+/* Improve table styling */
+.table-dark {
+    --bs-table-bg: var(--bs-dark);
+}
+
+/* Sticky navigation */
+.sticky-top {
+    top: 1rem;
+}
+
+/* Icon alignment */
+[data-feather] {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+}
+
+/* Badge styling */
+.badge {
+    font-size: 0.75em;
+}
+
+/* Alert styling improvements */
+.alert {
+    border: 1px solid rgba(var(--bs-info-rgb), 0.2);
+}
+
+.alert-info {
+    background-color: rgba(var(--bs-info-rgb), 0.1);
+    color: var(--bs-info);
+}
+
+.alert-warning {
+    background-color: rgba(var(--bs-warning-rgb), 0.1);
+    color: var(--bs-warning);
+}
+
+/* Form improvements */
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Navigation improvements */
+.nav-pills .nav-link {
+    color: var(--bs-secondary);
+    font-size: 0.875rem;
+}
+
+.nav-pills .nav-link:hover {
+    color: var(--bs-primary);
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+/* Card improvements */
+.card {
+    border: 1px solid rgba(255, 255, 255, 0.125);
+    background-color: var(--bs-dark);
+}
+
+/* Button improvements */
+.btn-outline-primary:hover {
+    color: white;
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Results display */
+#results-content {
+    max-height: 400px;
+    overflow-y: auto;
+    font-size: 0.875rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .display-5 {
+        font-size: 1.75rem;
+    }
+    
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    pre {
+        font-size: 0.75rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .sticky-top {
+        position: relative !important;
+        top: auto !important;
+    }
+}
+
+/* Dark theme enhancements */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+    }
+}
+
+/* Accessibility improvements */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Focus improvements for keyboard navigation */
+.btn:focus,
+.form-control:focus,
+.nav-link:focus {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
+/* Improve link contrast */
+a {
+    color: var(--bs-primary);
+}
+
+a:hover {
+    color: var(--bs-primary);
+    opacity: 0.8;
+}
+
+/* Status indicators */
+.status-online {
+    color: var(--bs-success);
+}
+
+.status-offline {
+    color: var(--bs-danger);
+}
+
+.status-error {
+    color: var(--bs-warning);
+}
