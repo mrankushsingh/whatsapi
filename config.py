@@ -77,11 +77,19 @@ def validate_whatsapp_link(link: str) -> Dict[str, Any]:
             "message": "WhatsApp group code is missing from the link"
         }
     
-    # Validate group code format (alphanumeric, typically 22 characters)
-    if not re.match(r'^[A-Za-z0-9]{10,30}$', group_code):
+    # Validate group code format - be more permissive
+    # WhatsApp group codes can contain various characters
+    if len(group_code) < 3 or len(group_code) > 100:
         return {
             "valid": False,
-            "message": "Invalid WhatsApp group code format"
+            "message": "WhatsApp group code length should be between 3 and 100 characters."
+        }
+    
+    # Allow most printable characters except spaces and some problematic ones
+    if not re.match(r'^[A-Za-z0-9_\-+=/.]+$', group_code):
+        return {
+            "valid": False,
+            "message": "WhatsApp group code contains invalid characters."
         }
     
     return {
